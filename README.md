@@ -1,35 +1,66 @@
 
-Task 1: Understand the Dataset
-Objective
-The objective of this analysis is to identify the factors that influence monthly sales across retail stores. The findings will help management make evidence-based decisions regarding marketing investment, inventory management, staffing, discount strategies, and store operations.
-1. Dependent Variable
-The dependent (target) variable is the outcome the regression model will predict.
-VariableReasonmonthly_salesThis is the primary business outcome that leadership wants to explain and predict. It will serve as the dependent variable in the regression model.
+**Analysis Objective:** To identify key operational factors influencing monthly sales to inform strategic resource allocation.
 
+---
 
-2. Potential Independent Variables
-The following variables are potential predictors of monthly sales.
-VariableExpected Relationship with Salesmarketing_spendHigher marketing investment is expected to increase customer awareness and sales.footfall. More customer visits are generally associated with higher sales.avg_discount_pctDiscounts may increase sales volume but could also reduce margins.staff_countAdequate staffing may improve customer service and sales performance.inventory_availability_pctBetter product availability should reduce lost sales opportunities.competitor_distance_kmStores farther from competitors may experience higher sales.holiday_flagSales may increase during holiday periods.customer_ratingHigher customer satisfaction may positively influence repeat purchases and sales.regionSales may differ across geographic regions.store_typeDifferent store formats may generate different sales levels.monthSeasonal effects may influence monthly sales performance.
+## 1. Business Problem Summary
 
-3. Numerical Variables
-The following variables contain quantitative values suitable for regression analysis.
+Leadership identified a need to understand why monthly sales fluctuate across the store network. The objective was to move from anecdotal understanding to an evidence-based model that identifies which business levers (marketing, staffing, inventory, traffic) provide the highest return on investment.
 
-marketing_spend
-footfall
-avg_discount_pct
-staff_count
-inventory_availability_pct
-competitor_distance_km
-customer_rating
-monthly_sales
-monthly_profit
+## 2. Dataset Description
 
-4. Categorical Variables
-These variables represent categories and should be encoded before regression.
-VariableRecommended TreatmentregionOne-hot (dummy) encodingstore_typeOne-hot (dummy) encodingmonthEncode as dummy variables if seasonality is being modeledholiday_flagBinary variable (0 = No, 1 = Yes); can be used directly if already numeric5. Variables Requiring Cleaning or Transformation
-Before fitting the regression model, the following preprocessing steps should be considered.
-VariableSuggested Preparationmarketing_spendCheck for missing values and outliers; consider scaling if required.footfallCheck for missing values and extreme observations.avg_discount_pctVerify values fall within a valid percentage range (0–100).inventory_availability_pctConfirm values are within 0–100%.customer_ratingVerify rating scale and identify missing values.monthConvert to categorical variables if modeling seasonality.regionEncode as dummy variables.store_typeEncode as dummy variables.6. Variables That May Not Be
+* **Total Observations:** 320 monthly store performance records.
+* **Scope:** Covers 4 regions, 4 store types, and key operational metrics.
+* **Cleaning:** Missing values in `competitor_distance_km` and `customer_rating` were imputed using median values to ensure statistical robustness. Outliers were retained as they reflect legitimate, albeit extreme, business performance.
 
-Useful for Regression
-VariableReasonstore_idActs as a unique identifier and does not explain sales performance. It should not be included as a predictor.monthly_profitThis variable is strongly related to sales and is likely an outcome rather than a driver. Including it as an independent variable when predicting monthly sales may introduce data leakage and bias the regression results.Summary
-The regression analysis will use monthly_sales as the dependent variable and evaluate how operational, marketing, customer, and store characteristics influence sales performance. Numerical predictors will be assessed directly, while categorical variables such as region, store_type, and month will be encoded before modeling. Variables that serve as identifiers (store_id) or represent business outcomes (monthly_profit) will be excluded to prevent biased or misleading regression results.
+## 3. Dependent and Independent Variables
+
+* **Dependent Variable:** `monthly_sales` (Predictive Target).
+* **Numerical Predictors:** `marketing_spend`, `footfall`, `avg_discount_pct`, `staff_count`, `inventory_availability_pct`, `competitor_distance_km`, `customer_rating`.
+* **Categorical Predictors:** `region`, `store_type`, `holiday_flag`.
+
+## 4. Regression Approach
+
+We employed **Ordinary Least Squares (OLS) Multiple Regression**. This approach was chosen to isolate the impact of individual variables while holding all other factors constant, thereby controlling for variables like location when measuring the impact of marketing or staffing.
+
+## 5. Dummy Variable Approach
+
+To include categorical strings (Region/Store Type) in the model, they were encoded as binary (0/1) flags.
+
+* **Reference Categories (Baseline):** `Region: East` and `Store Type: Airport`.
+* **Methodology:** We omitted the reference categories to avoid the **"Dummy Variable Trap"** (perfect multicollinearity). Coefficients for other categories represent the performance premium or deficit relative to these baselines.
+
+## 6. Model Comparison Summary
+
+| Metric | Simple Model (Footfall Only) | Final Multiple Regression |
+| --- | --- | --- |
+| **$R^2$ (Explanatory Power)** | 73.6% | **82.7%** |
+| **Statistical Significance** | High | **Extremely High** |
+| **Strategic Utility** | Limited | **Comprehensive** |
+
+## 7. Final Model Selected
+
+**The Multiple Regression Model** was selected as the definitive model because it explains **82.7%** of the variance in sales. It provides the most "realistic" view of the business by simultaneously accounting for the interaction between physical traffic, inventory health, and regional factors.
+
+---
+
+## 8. Business Recommendations
+
+* **Prioritize Footfall:** Traffic is the #1 sales engine. Marketing should focus on high-intent local acquisition.
+* **Improve Inventory:** A 1% increase in inventory availability drives ~$2,961 in sales. **Prioritize supply chain stability over general advertising.**
+* **Replicate Success:** Investigate the "Best-in-Class" operational processes in South and West regions to export those efficiencies to the East and North.
+* **Format Review:** Residential and High Street formats are underperforming relative to Airport hubs. Investigate if these require a different labor model or inventory mix.
+
+## 9. Assumptions and Limitations
+
+* **Causality vs. Correlation:** Regression shows that staff count is *associated* with sales, but it does not *prove* adding staff will increase sales (staffing might be a result of high sales). **A/B Testing is required before major CapEx.**
+* **Unmeasured Factors:** We have a 17.3% "unexplained" variance, likely due to factors like store square footage, competitor pricing strategies, and local economic sentiment.
+
+---
+
+## 10. Evidence Summary (Screenshots)
+**`analysis/regression_workbook.xlsx`**: Contains all raw data, dummy transformations, and OLS regression tables.
+**`outputs/model_equations.md`**: Contains the full mathematical equations and variable mapping.
+**`analysis/residual_analysis.md`**: Contains the audit of the "Top 5" outliers (high and low residuals) to identify best-practice stores vs. operational friction points.
+**`screenshots/residuals_preview.png`**: [A visualization showing the distribution of residuals, confirming no systematic bias in the model].
+
