@@ -8,7 +8,7 @@ Linear regression models require numerical input variables. Therefore, categoric
 
 However, including dummy variables for **all categories** together with the regression intercept would create **perfect multicollinearity**, commonly known as the **Dummy Variable Trap**. In this situation, one dummy variable can be perfectly predicted from the others, preventing the regression model from estimating unique coefficients.
 
-To avoid this problem, one category from each categorical variable was omitted and used as the **reference category**.
+To avoid this problem, one category from each categorical variable is omitted and used as the **reference category**.
 
 # Reference Categories
 
